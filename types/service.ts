@@ -1,4 +1,4 @@
-import type { ContractStatus, ServiceStatus } from "./account";
+import type { ContractStatus, ServiceStatus } from "./clientOrganization";
 
 export type Sku = {
   id: string;
@@ -9,7 +9,7 @@ export type Sku = {
 
 export type Contract = {
   id: string;
-  accountId: string;
+  organizationId: string;
   serviceName: string;
   serviceStatus: ServiceStatus;
   contractType: string;
@@ -23,7 +23,7 @@ export type Contract = {
 };
 
 export type NewContractInput = {
-  accountId: string;
+  organizationId: string;
   serviceName: string;
   contractType: string;
   contractName: string;

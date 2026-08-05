@@ -6,13 +6,15 @@ import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import Button from "@/components/ui/Button";
 import { SERVICE_NAMES } from "@/services/contracts";
-import type { Account, NewContractInput } from "@/types";
+import type { ClientOrganization, Contract, NewContractInput } from "@/types";
 
 type ContractFormProps = {
   open: boolean;
-  accounts: Account[];
+  organizations: ClientOrganization[];
+  initialContract?: Contract | null;
   onClose: () => void;
   onSubmit: (input: NewContractInput) => void;
+  onEditSubmit?: (contractId: string, input: NewContractInput) => void;
 };
 
 const CONTRACT_TYPES = ["Subscription", "Trial"];
@@ -21,9 +23,9 @@ function today(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function emptyForm(accounts: Account[]): NewContractInput {
+function emptyForm(organizations: ClientOrganization[]): NewContractInput {
   return {
-    accountId: accounts[0]?.id ?? "",
+    organizationId: organizations[0]?.id ?? "",
     serviceName: SERVICE_NAMES[0],
     contractType: CONTRACT_TYPES[0],
     contractName: "",
@@ -34,39 +36,70 @@ function emptyForm(accounts: Account[]): NewContractInput {
   };
 }
 
+function contractToInput(contract: Contract): NewContractInput {
+  return {
+    organizationId: contract.organizationId,
+    serviceName: contract.serviceName,
+    contractType: contract.contractType,
+    contractName: contract.contractName,
+    packageSku: contract.packageSku,
+    quantity: contract.quantity,
+    registrationDate: contract.registrationDate,
+    expiresOn: contract.expiresOn,
+  };
+}
+
 export default function ContractForm({
   open,
-  accounts,
+  organizations,
+  initialContract = null,
   onClose,
   onSubmit,
+  onEditSubmit,
 }: ContractFormProps) {
-  const [form, setForm] = useState<NewContractInput>(() => emptyForm(accounts));
+  const [form, setForm] = useState<NewContractInput>(() =>
+    initialContract ? contractToInput(initialContract) : emptyForm(organizations)
+  );
+  const [lastContractId, setLastContractId] = useState(initialContract?.id ?? null);
+
+  if ((initialContract?.id ?? null) !== lastContractId) {
+    setLastContractId(initialContract?.id ?? null);
+    setForm(initialContract ? contractToInput(initialContract) : emptyForm(organizations));
+  }
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    onSubmit(form);
-    setForm(emptyForm(accounts));
+    if (initialContract && onEditSubmit) {
+      onEditSubmit(initialContract.id, form);
+    } else {
+      onSubmit(form);
+      setForm(emptyForm(organizations));
+    }
   }
 
   return (
     <SlideOver
-      title="Add Contract"
-      subtitle="Add or extend a seat contract for a client account."
+      title={initialContract ? "Edit Contract" : "Add Contract"}
+      subtitle={
+        initialContract
+          ? "Update this contract's terms for the client organization."
+          : "Add or extend a seat contract for a client organization."
+      }
       open={open}
       onClose={onClose}
       widthClassName="max-w-md"
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Select
-          id="contract-account"
-          label="Account"
+          id="contract-organization"
+          label="Client Organization"
           required
-          value={form.accountId}
-          onChange={(event) => setForm({ ...form, accountId: event.target.value })}
+          value={form.organizationId}
+          onChange={(event) => setForm({ ...form, organizationId: event.target.value })}
         >
-          {accounts.map((account) => (
-            <option key={account.id} value={account.id}>
-              {account.name}
+          {organizations.map((organization) => (
+            <option key={organization.id} value={organization.id}>
+              {organization.name}
             </option>
           ))}
         </Select>
@@ -150,8 +183,8 @@ export default function ContractForm({
           <Button type="button" variant="secondary" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={accounts.length === 0}>
-            Add Contract
+          <Button type="submit" disabled={organizations.length === 0}>
+            {initialContract ? "Save Changes" : "Add Contract"}
           </Button>
         </div>
       </form>

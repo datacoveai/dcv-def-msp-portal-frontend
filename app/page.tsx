@@ -1,7 +1,7 @@
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import PageHeader from "@/components/common/PageHeader";
 import StatCardGrid from "@/components/dashboard/StatCardGrid";
-import LicenseSummary from "@/components/dashboard/LicenseSummary";
+import ExpiringContractsCard from "@/components/dashboard/ExpiringContractsCard";
 import DashboardBottom from "@/components/dashboard/DashboardBottom";
 
 export default function Home() {
@@ -12,10 +12,9 @@ export default function Home() {
         description="Welcome to the DataCove DefenceNet MSP Portal."
       />
 
-     <StatCardGrid />
-     <LicenseSummary />
-     <DashboardBottom />
+      <StatCardGrid />
+      <ExpiringContractsCard />
+      <DashboardBottom />
     </DashboardLayout>
-    
   );
 }

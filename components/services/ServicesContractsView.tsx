@@ -4,20 +4,21 @@ import { useEffect, useMemo, useState } from "react";
 import ContractFilters from "@/components/services/ContractFilters/ContractFilters";
 import ContractsTable, { ContractRow } from "@/components/services/ContractsTable/ContractsTable";
 import ContractForm from "@/components/services/ContractForm/ContractForm";
-import AccountDetailPanel from "@/components/accounts/AccountDetailPanel/AccountDetailPanel";
+import ClientOrganizationDetailPanel from "@/components/clientOrganizations/ClientOrganizationDetailPanel/ClientOrganizationDetailPanel";
 import Toast from "@/components/ui/Toast";
-import { listAccounts, listContracts } from "@/services";
+import { listClientOrganizations, listContracts } from "@/services";
 import type { Contract, ContractStatus, NewContractInput } from "@/types";
 
 export default function ServicesContractsView() {
-  const [accounts] = useState(() => listAccounts());
+  const [organizations] = useState(() => listClientOrganizations());
   const [contracts, setContracts] = useState<Contract[]>(() => listContracts());
   const [searchTerm, setSearchTerm] = useState("");
   const [serviceFilter, setServiceFilter] = useState<string | "ALL">("ALL");
   const [statusFilter, setStatusFilter] = useState<ContractStatus | "ALL">("ALL");
   const [showArchived, setShowArchived] = useState(false);
-  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
+  const [selectedOrganizationId, setSelectedOrganizationId] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
+  const [editingContract, setEditingContract] = useState<Contract | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -26,10 +27,10 @@ export default function ServicesContractsView() {
     return () => clearTimeout(timeout);
   }, [toastMessage]);
 
-  const accountsById = useMemo(() => {
-    const map = new Map(accounts.map((account) => [account.id, account]));
+  const organizationsById = useMemo(() => {
+    const map = new Map(organizations.map((organization) => [organization.id, organization]));
     return map;
-  }, [accounts]);
+  }, [organizations]);
 
   const rows: ContractRow[] = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
@@ -44,24 +45,25 @@ export default function ServicesContractsView() {
       )
       .map((contract) => ({
         ...contract,
-        accountName: accountsById.get(contract.accountId)?.name ?? "Unknown Account",
+        organizationName:
+          organizationsById.get(contract.organizationId)?.name ?? "Unknown Organization",
       }))
       .filter((row) => {
         if (term === "") return true;
         return (
-          row.accountName.toLowerCase().includes(term) ||
+          row.organizationName.toLowerCase().includes(term) ||
           row.contractName.toLowerCase().includes(term) ||
           row.packageSku.toLowerCase().includes(term)
         );
       });
-  }, [contracts, accountsById, searchTerm, serviceFilter, statusFilter, showArchived]);
+  }, [contracts, organizationsById, searchTerm, serviceFilter, statusFilter, showArchived]);
 
-  const selectedAccount = accountsById.get(selectedAccountId ?? "") ?? null;
+  const selectedOrganization = organizationsById.get(selectedOrganizationId ?? "") ?? null;
 
   function handleAddContract(input: NewContractInput) {
     const newContract: Contract = {
       id: `ctr-${contracts.length + 1}-${Date.now()}`,
-      accountId: input.accountId,
+      organizationId: input.organizationId,
       serviceName: input.serviceName,
       serviceStatus: "Require Activation",
       contractType: input.contractType,
@@ -77,7 +79,78 @@ export default function ServicesContractsView() {
     setContracts((current) => [...current, newContract]);
     setFormOpen(false);
     setToastMessage(
-      `Contract added for ${accountsById.get(input.accountId)?.name ?? "account"}.`
+      `Contract added for ${organizationsById.get(input.organizationId)?.name ?? "organization"}.`
+    );
+  }
+
+  function handleEditContractSubmit(contractId: string, input: NewContractInput) {
+    setContracts((current) =>
+      current.map((contract) =>
+        contract.id === contractId
+          ? {
+              ...contract,
+              organizationId: input.organizationId,
+              serviceName: input.serviceName,
+              contractType: input.contractType,
+              contractName: input.contractName,
+              packageSku: input.packageSku,
+              quantity: input.quantity,
+              registrationDate: input.registrationDate,
+              expiresOn: input.expiresOn,
+            }
+          : contract
+      )
+    );
+    setFormOpen(false);
+    setEditingContract(null);
+    setToastMessage("Contract updated.");
+  }
+
+  function handleOpenAddForm() {
+    setEditingContract(null);
+    setFormOpen(true);
+  }
+
+  function handleOpenEditForm(contractId: string) {
+    const contract = contracts.find((item) => item.id === contractId);
+    if (!contract) return;
+    setEditingContract(contract);
+    setFormOpen(true);
+  }
+
+  function handleRenewContract(contractId: string) {
+    setContracts((current) =>
+      current.map((contract) => {
+        if (contract.id !== contractId) return contract;
+
+        const base = contract.expiresOn ? new Date(contract.expiresOn) : new Date();
+        base.setFullYear(base.getFullYear() + 1);
+
+        return {
+          ...contract,
+          expiresOn: base.toISOString().slice(0, 10),
+          contractStatus:
+            contract.serviceStatus === "Require Activation" ? "Pending" : "Active",
+        };
+      })
+    );
+
+    const contract = contracts.find((item) => item.id === contractId);
+    setToastMessage(
+      `Contract renewed for ${organizationsById.get(contract?.organizationId ?? "")?.name ?? "organization"}.`
+    );
+  }
+
+  function handleTerminateContract(contractId: string) {
+    setContracts((current) =>
+      current.map((contract) =>
+        contract.id === contractId ? { ...contract, contractStatus: "Terminated" } : contract
+      )
+    );
+
+    const contract = contracts.find((item) => item.id === contractId);
+    setToastMessage(
+      `Contract terminated for ${organizationsById.get(contract?.organizationId ?? "")?.name ?? "organization"}.`
     );
   }
 
@@ -92,22 +165,33 @@ export default function ServicesContractsView() {
         onStatusFilterChange={setStatusFilter}
         showArchived={showArchived}
         onShowArchivedChange={setShowArchived}
-        onAddContract={() => setFormOpen(true)}
+        onAddContract={handleOpenAddForm}
       />
 
-      <ContractsTable rows={rows} onSelectAccount={setSelectedAccountId} />
+      <ContractsTable
+        rows={rows}
+        onSelectOrganization={setSelectedOrganizationId}
+        onEditContract={handleOpenEditForm}
+        onRenewContract={handleRenewContract}
+        onTerminateContract={handleTerminateContract}
+      />
 
-      <AccountDetailPanel
-        account={selectedAccount}
-        onClose={() => setSelectedAccountId(null)}
+      <ClientOrganizationDetailPanel
+        organization={selectedOrganization}
+        onClose={() => setSelectedOrganizationId(null)}
         defaultTab="services"
       />
 
       <ContractForm
         open={formOpen}
-        accounts={accounts}
-        onClose={() => setFormOpen(false)}
+        organizations={organizations}
+        initialContract={editingContract}
+        onClose={() => {
+          setFormOpen(false);
+          setEditingContract(null);
+        }}
         onSubmit={handleAddContract}
+        onEditSubmit={handleEditContractSubmit}
       />
 
       <Toast message={toastMessage} />

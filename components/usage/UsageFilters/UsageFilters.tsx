@@ -13,7 +13,7 @@ export default function UsageFilters({
     <div className="mt-8 mb-2 flex">
       <Input
         type="text"
-        placeholder="Search by account name..."
+        placeholder="Search by organization name..."
         className="w-full md:w-96"
         value={searchTerm}
         onChange={(event) => onSearchTermChange(event.target.value)}

@@ -1,5 +1,5 @@
 export type UsageRecord = {
-  accountId: string;
+  organizationId: string;
   date: string;
   activeSeats: number;
   activations: number;

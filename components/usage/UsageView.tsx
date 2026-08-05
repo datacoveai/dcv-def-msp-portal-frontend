@@ -4,22 +4,22 @@ import { useMemo, useState } from "react";
 import StatCard from "@/components/dashboard/StatCard";
 import UsageFilters from "@/components/usage/UsageFilters/UsageFilters";
 import UsageTable, { UsageRow } from "@/components/usage/UsageTable/UsageTable";
-import AccountDetailPanel from "@/components/accounts/AccountDetailPanel/AccountDetailPanel";
-import { listAccounts, getLatestTwoUsageRecords } from "@/services";
+import ClientOrganizationDetailPanel from "@/components/clientOrganizations/ClientOrganizationDetailPanel/ClientOrganizationDetailPanel";
+import { listClientOrganizations, getLatestTwoUsageRecords } from "@/services";
 
 export default function UsageView() {
-  const [accounts] = useState(() => listAccounts());
+  const [organizations] = useState(() => listClientOrganizations());
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
+  const [selectedOrganizationId, setSelectedOrganizationId] = useState<string | null>(null);
 
   const rows: UsageRow[] = useMemo(() => {
-    return accounts.map((account) => {
-      const latestTwo = getLatestTwoUsageRecords(account.id);
+    return organizations.map((organization) => {
+      const latestTwo = getLatestTwoUsageRecords(organization.id);
       const [latest, previous] = latestTwo;
 
       const utilization =
-        account.seatsAllocated > 0
-          ? (account.seatsActive / account.seatsAllocated) * 100
+        organization.seatsAllocated > 0
+          ? (organization.seatsActive / organization.seatsAllocated) * 100
           : 0;
 
       const trendPercent =
@@ -28,34 +28,39 @@ export default function UsageView() {
           : null;
 
       return {
-        accountId: account.id,
-        accountName: account.name,
-        accountType: account.type,
-        seatsAllocated: account.seatsAllocated,
-        seatsActive: account.seatsActive,
+        organizationId: organization.id,
+        organizationName: organization.name,
+        seatsAllocated: organization.seatsAllocated,
+        seatsActive: organization.seatsActive,
         utilization,
         trendPercent,
         lastRecorded: latest?.date ?? null,
       };
     });
-  }, [accounts]);
+  }, [organizations]);
 
   const filteredRows = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
     if (term === "") return rows;
-    return rows.filter((row) => row.accountName.toLowerCase().includes(term));
+    return rows.filter((row) => row.organizationName.toLowerCase().includes(term));
   }, [rows, searchTerm]);
 
   const totals = useMemo(() => {
-    const totalAllocated = accounts.reduce((sum, account) => sum + account.seatsAllocated, 0);
-    const totalActive = accounts.reduce((sum, account) => sum + account.seatsActive, 0);
+    const totalAllocated = organizations.reduce(
+      (sum, organization) => sum + organization.seatsAllocated,
+      0
+    );
+    const totalActive = organizations.reduce(
+      (sum, organization) => sum + organization.seatsActive,
+      0
+    );
     const overallUtilization = totalAllocated > 0 ? (totalActive / totalAllocated) * 100 : 0;
 
     return { totalAllocated, totalActive, overallUtilization };
-  }, [accounts]);
+  }, [organizations]);
 
-  const selectedAccount =
-    accounts.find((account) => account.id === selectedAccountId) ?? null;
+  const selectedOrganization =
+    organizations.find((organization) => organization.id === selectedOrganizationId) ?? null;
 
   return (
     <>
@@ -70,11 +75,11 @@ export default function UsageView() {
 
       <UsageFilters searchTerm={searchTerm} onSearchTermChange={setSearchTerm} />
 
-      <UsageTable rows={filteredRows} onSelectAccount={setSelectedAccountId} />
+      <UsageTable rows={filteredRows} onSelectOrganization={setSelectedOrganizationId} />
 
-      <AccountDetailPanel
-        account={selectedAccount}
-        onClose={() => setSelectedAccountId(null)}
+      <ClientOrganizationDetailPanel
+        organization={selectedOrganization}
+        onClose={() => setSelectedOrganizationId(null)}
         defaultTab="usage"
       />
     </>

@@ -1,6 +1,7 @@
-import type { Account, Contract } from "@/types";
+import type { ClientOrganization, Contract } from "@/types";
+import { getEffectiveContractStatus } from "@/utils/contractStatus";
 
-export type AccountSummary = {
+export type ClientOrganizationSummary = {
   total: number;
   paying: number;
   trial: number;
@@ -8,40 +9,57 @@ export type AccountSummary = {
   aboutToExpire: number;
   expired: number;
   operationalIssues: number;
+  totalAllocatedSeats: number;
+  totalActiveSeats: number;
+  overallUtilizationPercent: number;
 };
 
-export function computeAccountSummary(
-  accounts: Account[],
+export function computeClientOrganizationSummary(
+  organizations: ClientOrganization[],
   contracts: Contract[]
-): AccountSummary {
-  const accountIdsRequiringActivation = new Set(
-    accounts
-      .filter((account) =>
-        account.services.some((service) => service.status === "Require Activation")
+): ClientOrganizationSummary {
+  const organizationIdsRequiringActivation = new Set(
+    organizations
+      .filter((organization) =>
+        organization.services.some((service) => service.status === "Require Activation")
       )
-      .map((account) => account.id)
+      .map((organization) => organization.id)
   );
 
-  const accountIdsAboutToExpire = new Set(
+  const organizationIdsAboutToExpire = new Set(
     contracts
-      .filter((contract) => contract.contractStatus === "About to Expire")
-      .map((contract) => contract.accountId)
+      .filter((contract) => getEffectiveContractStatus(contract) === "About to Expire")
+      .map((contract) => contract.organizationId)
   );
 
-  const accountIdsExpired = new Set(
+  const organizationIdsExpired = new Set(
     contracts
-      .filter((contract) => contract.contractStatus === "Expired")
-      .map((contract) => contract.accountId)
+      .filter((contract) => getEffectiveContractStatus(contract) === "Expired")
+      .map((contract) => contract.organizationId)
+  );
+
+  const totalAllocatedSeats = organizations.reduce(
+    (sum, organization) => sum + organization.seatsAllocated,
+    0
+  );
+  const totalActiveSeats = organizations.reduce(
+    (sum, organization) => sum + organization.seatsActive,
+    0
   );
 
   return {
-    total: accounts.length,
-    paying: accounts.filter((account) => account.status === "Paying").length,
-    trial: accounts.filter((account) => account.status === "Trial").length,
-    requiresActivation: accountIdsRequiringActivation.size,
-    aboutToExpire: accountIdsAboutToExpire.size,
-    expired: accountIdsExpired.size,
-    operationalIssues: accounts.filter((account) => account.operationalIssues > 0)
-      .length,
+    total: organizations.length,
+    paying: organizations.filter((organization) => organization.status === "Paying").length,
+    trial: organizations.filter((organization) => organization.status === "Trial").length,
+    requiresActivation: organizationIdsRequiringActivation.size,
+    aboutToExpire: organizationIdsAboutToExpire.size,
+    expired: organizationIdsExpired.size,
+    operationalIssues: organizations.filter(
+      (organization) => organization.operationalIssues > 0
+    ).length,
+    totalAllocatedSeats,
+    totalActiveSeats,
+    overallUtilizationPercent:
+      totalAllocatedSeats > 0 ? (totalActiveSeats / totalAllocatedSeats) * 100 : 0,
   };
 }

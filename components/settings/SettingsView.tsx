@@ -4,15 +4,13 @@ import { useEffect, useState } from "react";
 import GeneralSettings from "@/components/settings/GeneralSettings/GeneralSettings";
 import IdentitySettings from "@/components/settings/IdentitySettings/IdentitySettings";
 import Toast from "@/components/ui/Toast";
-import { getAccount, listUsers } from "@/services";
+import { getMspProfile, listMspUsers } from "@/services";
 
 export default function SettingsView() {
-  const [mspAccount] = useState(() => getAccount("acc-msp"));
-  const [users] = useState(() => listUsers());
-  const [name, setName] = useState(mspAccount?.name ?? "");
-  const [mainAdministratorEmail, setMainAdministratorEmail] = useState(
-    mspAccount?.mainAdministratorEmail ?? ""
-  );
+  const [mspProfile] = useState(() => getMspProfile());
+  const [users] = useState(() => listMspUsers());
+  const [name, setName] = useState(mspProfile.name);
+  const [supportEmail, setSupportEmail] = useState(mspProfile.supportEmail);
   const [enforceTwoFactor, setEnforceTwoFactor] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -39,9 +37,9 @@ export default function SettingsView() {
     <>
       <GeneralSettings
         name={name}
-        mainAdministratorEmail={mainAdministratorEmail}
+        supportEmail={supportEmail}
         onNameChange={setName}
-        onEmailChange={setMainAdministratorEmail}
+        onEmailChange={setSupportEmail}
         onSave={handleSaveGeneral}
       />
 

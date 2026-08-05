@@ -10,6 +10,7 @@ const CONTRACT_STATUSES: ContractStatus[] = [
   "Rejected",
   "About to Expire",
   "Expired",
+  "Terminated",
 ];
 
 type ContractFiltersProps = {
@@ -40,7 +41,7 @@ export default function ContractFilters({
       <div className="flex flex-col md:flex-row gap-3">
         <Input
           type="text"
-          placeholder="Search by account, contract, or SKU..."
+          placeholder="Search by organization, contract, or SKU..."
           className="w-full md:w-80"
           value={searchTerm}
           onChange={(event) => onSearchTermChange(event.target.value)}

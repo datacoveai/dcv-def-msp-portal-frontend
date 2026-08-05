@@ -1,6 +1,6 @@
-import type { AccountSummary } from "@/services";
+import type { ClientOrganizationSummary } from "@/services";
 
-export type AccountSummaryFilter =
+export type ClientOrganizationSummaryFilter =
   | "all"
   | "requiresActivation"
   | "aboutToExpire"
@@ -8,51 +8,51 @@ export type AccountSummaryFilter =
   | "operationalIssues";
 
 type Tile = {
-  key: AccountSummaryFilter;
+  key: ClientOrganizationSummaryFilter;
   label: string;
   value: number;
   accent: string;
 };
 
-type AccountSummaryTilesProps = {
-  summary: AccountSummary;
-  activeFilter: AccountSummaryFilter;
-  onFilterChange: (filter: AccountSummaryFilter) => void;
+type ClientOrganizationSummaryTilesProps = {
+  summary: ClientOrganizationSummary;
+  activeFilter: ClientOrganizationSummaryFilter;
+  onFilterChange: (filter: ClientOrganizationSummaryFilter) => void;
 };
 
-export default function AccountSummaryTiles({
+export default function ClientOrganizationSummaryTiles({
   summary,
   activeFilter,
   onFilterChange,
-}: AccountSummaryTilesProps) {
+}: ClientOrganizationSummaryTilesProps) {
   const tiles: Tile[] = [
     {
       key: "all",
-      label: `Total accounts (${summary.paying} Paying / ${summary.trial} Trial)`,
+      label: `Total client organizations (${summary.paying} Paying / ${summary.trial} Trial)`,
       value: summary.total,
       accent: "text-[#0F3A5E]",
     },
     {
       key: "requiresActivation",
-      label: "Accounts with services requiring activation",
+      label: "Client organizations with services requiring activation",
       value: summary.requiresActivation,
       accent: "text-amber-600",
     },
     {
       key: "aboutToExpire",
-      label: "Accounts with contracts about to expire",
+      label: "Client organizations with contracts about to expire",
       value: summary.aboutToExpire,
       accent: "text-amber-600",
     },
     {
       key: "expired",
-      label: "Accounts with expired contracts",
+      label: "Client organizations with expired contracts",
       value: summary.expired,
       accent: "text-red-600",
     },
     {
       key: "operationalIssues",
-      label: "Accounts with operational issues",
+      label: "Client organizations with operational issues",
       value: summary.operationalIssues,
       accent: "text-red-600",
     },

@@ -7,7 +7,7 @@ export default function UsersPage() {
     <DashboardLayout>
       <PageHeader
         title="Users"
-        description="Manage portal users and role assignments across every account."
+        description="Manage your MSP team's portal access and role assignments."
       />
       <UsersView />
     </DashboardLayout>

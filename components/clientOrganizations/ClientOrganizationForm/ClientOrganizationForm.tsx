@@ -5,25 +5,30 @@ import SlideOver from "@/components/ui/SlideOver";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import Button from "@/components/ui/Button";
-import type { AccountType, NewAccountInput } from "@/types";
+import type { AdministrationMode, NewClientOrganizationInput } from "@/types";
 
-type AccountFormProps = {
+type ClientOrganizationFormProps = {
   open: boolean;
   onClose: () => void;
-  onSubmit: (input: NewAccountInput) => void;
+  onSubmit: (input: NewClientOrganizationInput) => void;
 };
 
-const emptyForm: NewAccountInput = {
+const emptyForm: NewClientOrganizationInput = {
   name: "",
-  type: "CUSTOMER",
+  primaryContact: "",
   mainAdministratorEmail: "",
   seatsAllocated: 10,
+  administrationMode: "MSP Managed",
   isTrial: false,
   trialEndDate: null,
 };
 
-export default function AccountForm({ open, onClose, onSubmit }: AccountFormProps) {
-  const [form, setForm] = useState<NewAccountInput>(emptyForm);
+export default function ClientOrganizationForm({
+  open,
+  onClose,
+  onSubmit,
+}: ClientOrganizationFormProps) {
+  const [form, setForm] = useState<NewClientOrganizationInput>(emptyForm);
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -33,7 +38,7 @@ export default function AccountForm({ open, onClose, onSubmit }: AccountFormProp
 
   return (
     <SlideOver
-      title="New Account"
+      title="New Client Organization"
       subtitle="Onboard a client organization under your MSP."
       open={open}
       onClose={onClose}
@@ -41,28 +46,24 @@ export default function AccountForm({ open, onClose, onSubmit }: AccountFormProp
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Input
-          id="account-name"
-          label="Account Name"
+          id="org-name"
+          label="Organization Name"
           required
           value={form.name}
           onChange={(event) => setForm({ ...form, name: event.target.value })}
         />
 
-        <Select
-          id="account-type"
-          label="Account Type"
-          value={form.type}
-          onChange={(event) =>
-            setForm({ ...form, type: event.target.value as AccountType })
-          }
-        >
-          <option value="CUSTOMER">Customer</option>
-          <option value="MSSP">MSSP</option>
-        </Select>
+        <Input
+          id="org-primary-contact"
+          label="Primary Contact"
+          required
+          value={form.primaryContact}
+          onChange={(event) => setForm({ ...form, primaryContact: event.target.value })}
+        />
 
         <Input
-          id="main-admin-email"
-          label="Main Administrator Email"
+          id="org-admin-email"
+          label="Email"
           type="email"
           required
           value={form.mainAdministratorEmail}
@@ -72,8 +73,8 @@ export default function AccountForm({ open, onClose, onSubmit }: AccountFormProp
         />
 
         <Input
-          id="seats-allocated"
-          label="Seats Allocated"
+          id="org-seats-allocated"
+          label="Seat Allocation"
           type="number"
           min={1}
           required
@@ -82,6 +83,21 @@ export default function AccountForm({ open, onClose, onSubmit }: AccountFormProp
             setForm({ ...form, seatsAllocated: Number(event.target.value) })
           }
         />
+
+        <Select
+          id="org-administration-mode"
+          label="Administration Mode"
+          value={form.administrationMode}
+          onChange={(event) =>
+            setForm({
+              ...form,
+              administrationMode: event.target.value as AdministrationMode,
+            })
+          }
+        >
+          <option value="MSP Managed">MSP Managed</option>
+          <option value="Client Managed">Client Managed</option>
+        </Select>
 
         <label className="flex items-center gap-2 text-sm text-gray-700">
           <input
@@ -95,12 +111,12 @@ export default function AccountForm({ open, onClose, onSubmit }: AccountFormProp
               })
             }
           />
-          Start as trial account
+          Start as trial
         </label>
 
         {form.isTrial && (
           <Input
-            id="trial-end-date"
+            id="org-trial-end-date"
             label="Trial End Date"
             type="date"
             required
@@ -115,7 +131,7 @@ export default function AccountForm({ open, onClose, onSubmit }: AccountFormProp
           <Button type="button" variant="secondary" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit">Create Account</Button>
+          <Button type="submit">Create Client Organization</Button>
         </div>
       </form>
     </SlideOver>

@@ -4,7 +4,7 @@ import Button from "@/components/ui/Button";
 
 type GeneralSettingsProps = {
   name: string;
-  mainAdministratorEmail: string;
+  supportEmail: string;
   onNameChange: (value: string) => void;
   onEmailChange: (value: string) => void;
   onSave: () => void;
@@ -12,7 +12,7 @@ type GeneralSettingsProps = {
 
 export default function GeneralSettings({
   name,
-  mainAdministratorEmail,
+  supportEmail,
   onNameChange,
   onEmailChange,
   onSave,
@@ -26,24 +26,24 @@ export default function GeneralSettings({
     <div className="rounded-xl border bg-white p-6 shadow-sm">
       <h2 className="text-lg font-semibold text-gray-900">General</h2>
       <p className="mt-1 text-sm text-gray-500">
-        Your MSP&apos;s profile and main point of contact.
+        Your company profile and main point of contact.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4 max-w-md">
         <Input
-          id="settings-account-name"
-          label="Account Name"
+          id="settings-company-name"
+          label="Company Name"
           required
           value={name}
           onChange={(event) => onNameChange(event.target.value)}
         />
 
         <Input
-          id="settings-admin-email"
-          label="Main Administrator Email"
+          id="settings-support-email"
+          label="Support Email"
           type="email"
           required
-          value={mainAdministratorEmail}
+          value={supportEmail}
           onChange={(event) => onEmailChange(event.target.value)}
         />
 

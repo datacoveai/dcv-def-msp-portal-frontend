@@ -1,12 +1,13 @@
 import type { AuditEvent } from "@/types";
+import EmptyState from "@/components/ui/EmptyState";
 import { formatDateTime } from "@/utils/format";
 
 type AuditsTableProps = {
   events: AuditEvent[];
-  onSelectAccount: (accountName: string) => void;
+  onSelectOrganization: (organizationName: string) => void;
 };
 
-export default function AuditsTable({ events, onSelectAccount }: AuditsTableProps) {
+export default function AuditsTable({ events, onSelectOrganization }: AuditsTableProps) {
   return (
     <div className="mt-6 rounded-xl border bg-white shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
@@ -16,7 +17,7 @@ export default function AuditsTable({ events, onSelectAccount }: AuditsTableProp
               <th className="p-4 text-left font-medium">Timestamp</th>
               <th className="p-4 text-left font-medium">Actor</th>
               <th className="p-4 text-left font-medium">Action</th>
-              <th className="p-4 text-left font-medium">Account</th>
+              <th className="p-4 text-left font-medium">Client Organization</th>
               <th className="p-4 text-left font-medium">Details</th>
             </tr>
           </thead>
@@ -30,23 +31,23 @@ export default function AuditsTable({ events, onSelectAccount }: AuditsTableProp
                 <td className="p-4 text-gray-900 font-medium">{event.actor}</td>
                 <td className="p-4 text-gray-700">{event.action}</td>
                 <td className="p-4">
-                  <button
-                    onClick={() => onSelectAccount(event.accountName)}
-                    className="text-[#0F3A5E] hover:underline"
-                  >
-                    {event.accountName}
-                  </button>
+                  {event.organizationName ? (
+                    <button
+                      onClick={() => onSelectOrganization(event.organizationName as string)}
+                      className="text-[#0F3A5E] hover:underline"
+                    >
+                      {event.organizationName}
+                    </button>
+                  ) : (
+                    <span className="text-gray-400">—</span>
+                  )}
                 </td>
                 <td className="p-4 text-gray-600">{event.details}</td>
               </tr>
             ))}
 
             {events.length === 0 && (
-              <tr>
-                <td colSpan={5} className="p-8 text-center text-gray-500">
-                  No audit events match the current filters.
-                </td>
-              </tr>
+              <EmptyState message="No audit events match the current filters." colSpan={5} />
             )}
           </tbody>
         </table>

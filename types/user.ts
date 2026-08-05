@@ -10,15 +10,15 @@ export type PortalUser = {
   name: string;
   email: string;
   role: PortalUserRole;
-  accountId: string;
-  accountName: string;
+  organizationId: string | null;
+  organizationName: string | null;
   twoFactorEnabled: boolean;
   status: PortalUserStatus;
   lastLogin: string | null;
+  invitedAt: string | null;
 };
 
 export type NewPortalUserInput = {
-  accountId: string;
   name: string;
   email: string;
   role: PortalUserRole;

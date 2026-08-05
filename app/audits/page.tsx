@@ -7,7 +7,7 @@ export default function AuditsPage() {
     <DashboardLayout>
       <PageHeader
         title="Audits"
-        description="Review privileged actions across every account in your tenant."
+        description="Review privileged actions across your tenant."
       />
       <AuditsView />
     </DashboardLayout>

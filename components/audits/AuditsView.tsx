@@ -42,7 +42,7 @@ export default function AuditsView() {
           term === "" ||
           event.actor.toLowerCase().includes(term) ||
           event.action.toLowerCase().includes(term) ||
-          event.accountName.toLowerCase().includes(term) ||
+          (event.organizationName?.toLowerCase().includes(term) ?? false) ||
           event.details.toLowerCase().includes(term);
 
         const matchesActor = actorFilter === "ALL" || event.actor === actorFilter;
@@ -60,12 +60,12 @@ export default function AuditsView() {
   }, [events, searchTerm, actorFilter, actionFilter, dateFrom, dateTo]);
 
   function handleExportCsv() {
-    const columns = ["Timestamp", "Actor", "Action", "Account", "Details"];
+    const columns = ["Timestamp", "Actor", "Action", "Client Organization", "Details"];
     const rows = filteredEvents.map((event) => [
       formatDateTime(event.timestamp),
       event.actor,
       event.action,
-      event.accountName,
+      event.organizationName ?? "",
       event.details,
     ]);
 
@@ -91,7 +91,7 @@ export default function AuditsView() {
         onExportCsv={handleExportCsv}
       />
 
-      <AuditsTable events={filteredEvents} onSelectAccount={setSearchTerm} />
+      <AuditsTable events={filteredEvents} onSelectOrganization={setSearchTerm} />
 
       <Toast message={toastMessage} />
     </>

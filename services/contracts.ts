@@ -4,22 +4,8 @@ export const SERVICE_NAMES = ["Browser - Classic", "Email Security", "Mobile Sec
 
 const contracts: Contract[] = [
   {
-    id: "ctr-msp-1",
-    accountId: "acc-msp",
-    serviceName: "Browser - Classic",
-    serviceStatus: "Active",
-    contractType: "Subscription",
-    contractName: "Enterprise Bundle",
-    contractStatus: "Active",
-    packageSku: "DFN-BUNDLE-3000",
-    quantity: 3000,
-    registrationDate: "2026-04-09",
-    expiresOn: "2027-04-17",
-    archived: false,
-  },
-  {
     id: "ctr-1-1",
-    accountId: "acc-1",
+    organizationId: "acc-1",
     serviceName: "Mobile Security",
     serviceStatus: "Active",
     contractType: "Subscription",
@@ -33,7 +19,7 @@ const contracts: Contract[] = [
   },
   {
     id: "ctr-2-1",
-    accountId: "acc-2",
+    organizationId: "acc-2",
     serviceName: "Email Security",
     serviceStatus: "Active",
     contractType: "Subscription",
@@ -47,7 +33,7 @@ const contracts: Contract[] = [
   },
   {
     id: "ctr-2-2",
-    accountId: "acc-2",
+    organizationId: "acc-2",
     serviceName: "Browser - Classic",
     serviceStatus: "Require Activation",
     contractType: "Subscription",
@@ -61,7 +47,7 @@ const contracts: Contract[] = [
   },
   {
     id: "ctr-3-1",
-    accountId: "acc-3",
+    organizationId: "acc-3",
     serviceName: "Mobile Security",
     serviceStatus: "Require Activation",
     contractType: "Trial",
@@ -75,7 +61,7 @@ const contracts: Contract[] = [
   },
   {
     id: "ctr-4-1",
-    accountId: "acc-4",
+    organizationId: "acc-4",
     serviceName: "Email Security",
     serviceStatus: "Require Activation",
     contractType: "Subscription",
@@ -89,7 +75,7 @@ const contracts: Contract[] = [
   },
   {
     id: "ctr-5-1",
-    accountId: "acc-5",
+    organizationId: "acc-5",
     serviceName: "Browser - Classic",
     serviceStatus: "Require Activation",
     contractType: "Subscription",
@@ -107,6 +93,6 @@ export function listContracts(): Contract[] {
   return contracts;
 }
 
-export function listContractsByAccount(accountId: string): Contract[] {
-  return contracts.filter((contract) => contract.accountId === accountId);
+export function listContractsByOrganization(organizationId: string): Contract[] {
+  return contracts.filter((contract) => contract.organizationId === organizationId);
 }

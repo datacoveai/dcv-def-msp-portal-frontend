@@ -5,58 +5,40 @@ import SlideOver from "@/components/ui/SlideOver";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import Button from "@/components/ui/Button";
-import type { Account, NewPortalUserInput, PortalUserRole } from "@/types";
+import type { NewPortalUserInput, PortalUserRole } from "@/types";
 
 type UserFormProps = {
   open: boolean;
-  accounts: Account[];
   onClose: () => void;
   onSubmit: (input: NewPortalUserInput) => void;
 };
 
-const ROLES: PortalUserRole[] = ["MSP Admin", "MSP Operator", "Client Org Admin"];
+const ROLES: PortalUserRole[] = ["MSP Admin", "MSP Operator"];
 
-function emptyForm(accounts: Account[]): NewPortalUserInput {
-  return {
-    accountId: accounts[0]?.id ?? "",
-    name: "",
-    email: "",
-    role: "Client Org Admin",
-  };
-}
+const emptyForm: NewPortalUserInput = {
+  name: "",
+  email: "",
+  role: "MSP Operator",
+};
 
-export default function UserForm({ open, accounts, onClose, onSubmit }: UserFormProps) {
-  const [form, setForm] = useState<NewPortalUserInput>(() => emptyForm(accounts));
+export default function UserForm({ open, onClose, onSubmit }: UserFormProps) {
+  const [form, setForm] = useState<NewPortalUserInput>(emptyForm);
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     onSubmit(form);
-    setForm(emptyForm(accounts));
+    setForm(emptyForm);
   }
 
   return (
     <SlideOver
       title="Invite User"
-      subtitle="Invite a portal user and assign their role."
+      subtitle="Invite an MSP team member and assign their role."
       open={open}
       onClose={onClose}
       widthClassName="max-w-md"
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <Select
-          id="user-account"
-          label="Account"
-          required
-          value={form.accountId}
-          onChange={(event) => setForm({ ...form, accountId: event.target.value })}
-        >
-          {accounts.map((account) => (
-            <option key={account.id} value={account.id}>
-              {account.name}
-            </option>
-          ))}
-        </Select>
-
         <Input
           id="user-name"
           label="Full Name"
@@ -93,9 +75,7 @@ export default function UserForm({ open, accounts, onClose, onSubmit }: UserForm
           <Button type="button" variant="secondary" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={accounts.length === 0}>
-            Send Invite
-          </Button>
+          <Button type="submit">Send Invite</Button>
         </div>
       </form>
     </SlideOver>

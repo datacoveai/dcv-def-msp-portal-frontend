@@ -3,7 +3,7 @@ import Select from "@/components/ui/Select";
 import Button from "@/components/ui/Button";
 import type { PortalUserRole, PortalUserStatus } from "@/types";
 
-const ROLES: PortalUserRole[] = ["MSP Admin", "MSP Operator", "Client Org Admin"];
+const ROLES: PortalUserRole[] = ["MSP Admin", "MSP Operator"];
 const STATUSES: PortalUserStatus[] = ["Active", "Invited", "Suspended"];
 
 type UserFiltersProps = {
@@ -30,7 +30,7 @@ export default function UserFilters({
       <div className="flex flex-col md:flex-row gap-3">
         <Input
           type="text"
-          placeholder="Search by name, email, or account..."
+          placeholder="Search by name or email..."
           className="w-full md:w-80"
           value={searchTerm}
           onChange={(event) => onSearchTermChange(event.target.value)}

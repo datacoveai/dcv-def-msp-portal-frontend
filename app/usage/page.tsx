@@ -7,7 +7,7 @@ export default function UsagePage() {
     <DashboardLayout>
       <PageHeader
         title="Usage"
-        description="Seat consumption and utilization across every account."
+        description="Seat consumption and utilization across every client organization."
       />
       <UsageView />
     </DashboardLayout>

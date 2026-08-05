@@ -1,6 +1,4 @@
-export type AccountType = "MSSP" | "CUSTOMER";
-
-export type AccountStatus =
+export type ClientOrganizationStatus =
   | "Paying"
   | "Trial"
   | "Suspended"
@@ -14,34 +12,39 @@ export type ContractStatus =
   | "Pending"
   | "Rejected"
   | "About to Expire"
-  | "Expired";
+  | "Expired"
+  | "Terminated";
 
-export type AccountService = {
+export type AdministrationMode = "MSP Managed" | "Client Managed";
+
+export type OrganizationService = {
   name: string;
   status: ServiceStatus;
 };
 
-export type Account = {
+export type ClientOrganization = {
   id: string;
   name: string;
-  type: AccountType;
-  parentAccountId: string | null;
-  parentAccountName: string | null;
-  status: AccountStatus;
-  services: AccountService[];
+  parentOrganizationId: string | null;
+  parentOrganizationName: string | null;
+  status: ClientOrganizationStatus;
+  services: OrganizationService[];
   operationalIssues: number;
   earliestContractExpiry: string | null;
-  accountCreated: string;
+  createdAt: string;
   mainAdministratorEmail: string;
+  primaryContact: string;
+  administrationMode: AdministrationMode;
   seatsAllocated: number;
   seatsActive: number;
 };
 
-export type NewAccountInput = {
+export type NewClientOrganizationInput = {
   name: string;
-  type: AccountType;
+  primaryContact: string;
   mainAdministratorEmail: string;
   seatsAllocated: number;
+  administrationMode: AdministrationMode;
   isTrial: boolean;
   trialEndDate: string | null;
 };

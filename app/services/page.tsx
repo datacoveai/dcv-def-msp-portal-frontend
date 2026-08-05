@@ -7,7 +7,7 @@ export default function ServicesPage() {
     <DashboardLayout>
       <PageHeader
         title="Services & Contracts"
-        description="View and manage service contracts across every account."
+        description="View and manage service contracts across every client organization."
       />
       <ServicesContractsView />
     </DashboardLayout>

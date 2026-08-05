@@ -38,7 +38,7 @@ export default function AuditFilters({
       <div className="flex flex-col md:flex-row flex-wrap gap-3">
         <Input
           type="text"
-          placeholder="Search actor, action, account, or details..."
+          placeholder="Search actor, action, organization, or details..."
           className="w-full md:w-72"
           value={searchTerm}
           onChange={(event) => onSearchTermChange(event.target.value)}
